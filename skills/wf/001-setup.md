@@ -22,6 +22,17 @@ Prepare the worktree for work: ensure the per-repo config exists, run its setup 
   - Exit 0 → done.
   - Any non-zero → a configured command failed; treat as step failure.
 
+## Ensure speckit is initialized
+
+- [ ] Check if `.specify/` directory exists in the repo root (NOT the worktree — check the main repo via `git rev-parse --path-format=absolute --git-common-dir | xargs dirname`).
+  - If `.specify/` exists in the main repo → copy it to the worktree root if not already present: `cp -R <main_repo>/.specify .specify`
+  - If `.specify/` does NOT exist anywhere → initialize speckit:
+    ```bash
+    uvx --from "git+https://github.com/github/spec-kit.git" specify init --here
+    ```
+    This creates `.specify/` with templates, scripts, and config. The `--here` flag initializes in the current directory.
+- [ ] Verify `.specify/` exists after the above step. If initialization failed, treat as a non-blocking warning (speckit is optional — the SPECIFY step can fallback to manual spec writing).
+
 ## Record worktree identifiers
 
 - [ ] Persist into `.workflow/state.json` via `lib/set-data.sh`:
