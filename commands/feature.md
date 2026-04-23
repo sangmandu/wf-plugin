@@ -1,5 +1,5 @@
 ---
-description: Start the default wf feature workflow
+description: Start a wf feature workflow
 argument-hint: '<task>'
 ---
 
