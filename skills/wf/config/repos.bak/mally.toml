@@ -1,7 +1,0 @@
-[setup]
-commands = [
-  "mise trust && mise install",
-]
-
-[worktree]
-copy_from_main = []

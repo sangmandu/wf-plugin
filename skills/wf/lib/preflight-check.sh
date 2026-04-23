@@ -1,29 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─────────────────────────────────────────────────────────
-# wf Preflight Check (deterministic, <1s)
-#
-# Called by init-workflow.sh before state.json creation.
-# Checks tool availability + config validity + gitignore.
-#
-# Exit 0 = all good, proceed silently.
-# Exit 1 = problems found, stdout contains instructions
-#          for the agent to resolve.
-# ─────────────────────────────────────────────────────────
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 ERRORS=()
 FIXES=()
 AUTO_FIXED=()
 
 # ── 1. Global config ──
-CONFIG="$HOME/.claude/skills/wf/config/wf_config.toml"
+CONFIG="$HOME/.config/wf/wf_config.toml"
 if [ ! -f "$CONFIG" ]; then
   ERRORS+=("wf config not found: $CONFIG")
-  FIXES+=("Create $CONFIG with [identity] section (user_id, team_id UUIDs from Linear). If lost, see ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/recover-config.md")
+  FIXES+=("Create $CONFIG with [identity] section (user_id, team_id UUIDs from Linear). If lost, see $WF_ROOT/lib/recover-config.md")
 elif ! grep -q '^\[identity\]' "$CONFIG" 2>/dev/null; then
   ERRORS+=("wf config missing [identity] section")
-  FIXES+=("Add [identity] section with user_id and team_id to $CONFIG (recovery: ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/recover-config.md)")
+  FIXES+=("Add [identity] section with user_id and team_id to $CONFIG (recovery: $WF_ROOT/lib/recover-config.md)")
 fi
 
 # ── 2. Required tools ──
@@ -73,8 +64,8 @@ ensure_git_exclude "specs/"
 ensure_git_exclude ".workflow/"
 
 # ── 4. Stale worktree cleanup ──
-if [ -f "$HOME/.claude/skills/wf/lib/cleanup-stale-worktrees.sh" ]; then
-  bash "$HOME/.claude/skills/wf/lib/cleanup-stale-worktrees.sh" >/dev/null 2>&1 || true
+if [ -f "$WF_ROOT/lib/cleanup-stale-worktrees.sh" ]; then
+  bash "$WF_ROOT/lib/cleanup-stale-worktrees.sh" >/dev/null 2>&1 || true
 fi
 
 # ── Output ──

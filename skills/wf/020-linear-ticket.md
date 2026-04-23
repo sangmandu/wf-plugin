@@ -1,6 +1,6 @@
 # Step 020: LINEAR_TICKET
 
-Per `helpers#load_config` — read `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml`
+Per `helpers#load_config` — read `~/.config/wf/wf_config.toml`
 
 ## Prerequisites
 

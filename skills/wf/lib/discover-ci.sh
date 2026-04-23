@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
 # ─────────────────────────────────────────────────────────
 # discover-ci.sh — populate [repos.<project>].ci_checks in
-# ${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml by inspecting the
+# wf_config.toml by inspecting the
 # repo's CI config files and (optionally) a recent PR.
 #
 # Behavior:
@@ -26,8 +28,8 @@ STATE=".workflow/state.json"
 PROJECT="$(jq -r '.data.project_name // ""' "$STATE")"
 [[ -n "$PROJECT" ]] || { echo "ERROR: data.project_name not set" >&2; exit 1; }
 
-CONFIG="$HOME/.claude/skills/wf/config/wf_config.toml"
-CONFIG_PY="$HOME/.claude/skills/wf/lib/config.py"
+CONFIG="$HOME/.config/wf/wf_config.toml"
+CONFIG_PY="$WF_ROOT/lib/config.py"
 
 # Check if already populated.
 existing="$(python3 "$CONFIG_PY" "repos.$PROJECT.ci_checks" --json 2>/dev/null || echo '[]')"

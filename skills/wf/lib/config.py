@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared reader for ${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml.
+"""Shared reader for ~/.config/wf/wf_config.toml.
 
 Usage (CLI):
   config.py identity.user_id
@@ -13,7 +13,7 @@ import os
 import sys
 import tomllib
 
-CONFIG_PATH = os.path.expanduser("${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml")
+CONFIG_PATH = os.path.expanduser("~/.config/wf/wf_config.toml")
 
 
 def load():

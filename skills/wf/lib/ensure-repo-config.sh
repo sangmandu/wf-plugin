@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
 # ─────────────────────────────────────────────────────────
 # ensure-repo-config.sh — guarantee [repos.<project>] exists
-# in ${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml
+# in wf_config.toml
 #
 # If the section exists, exits 0 silently (no-op).
 # Otherwise, scans the repo for setup signals and prints a
@@ -22,11 +24,11 @@ STATE=".workflow/state.json"
 PROJECT="$(jq -r '.data.project_name // ""' "$STATE")"
 [[ -n "$PROJECT" ]] || { echo "ERROR: data.project_name not set in state.json" >&2; exit 1; }
 
-CONFIG="$HOME/.claude/skills/wf/config/wf_config.toml"
+CONFIG="$HOME/.config/wf/wf_config.toml"
 [[ -f "$CONFIG" ]] || { echo "ERROR: $CONFIG not found" >&2; exit 1; }
 
 # Already registered → done
-if python3 "$HOME/.claude/skills/wf/lib/config.py" --has-repo "$PROJECT" >/dev/null 2>&1; then
+if python3 "$WF_ROOT/lib/config.py" --has-repo "$PROJECT" >/dev/null 2>&1; then
   exit 0
 fi
 

@@ -42,4 +42,4 @@ One entry point: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh <command>`.
 If the user triggers `/wf` without a suffix, classify by task description. **Bias toward `fix` for any bug report** — the feature track has no reproduction gate. Ask the user if truly ambiguous.
 
 Per `helpers.yaml` for shared protocols.
-Per `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml` for identity + per-repo settings. Read values via `python3 ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/config.py <key.path>`.
+Per `~/.config/wf/wf_config.toml` for identity + per-repo settings. Read values via `python3 ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/config.py <key.path>`.

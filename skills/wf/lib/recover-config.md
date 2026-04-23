@@ -1,11 +1,11 @@
 # Recovering wf_config.toml
 
-Run this ONLY when `preflight-check.sh` fails with a missing/empty/malformed `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml` (or a missing `[identity]` section).
+Run this ONLY when `preflight-check.sh` fails with a missing/empty/malformed `~/.config/wf/wf_config.toml` (or a missing `[identity]` section).
 
 ## Recovery order
 
 1. **Check backups in the usual places first**:
-   - `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml.bak`
+   - `~/.config/wf/wf_config.toml.bak`
    - `tmutil listlocalsnapshots /` / Time Machine
    - dotfiles repo, if the user keeps one
 
@@ -36,6 +36,6 @@ Run this ONLY when `preflight-check.sh` fails with a missing/empty/malformed `${
    PY
    ```
 
-   Pick the most recent / most complete match, strip any `1\t`-style line-number prefixes from `Read` output, and write it back to `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml`.
+   Pick the most recent / most complete match, strip any `1\t`-style line-number prefixes from `Read` output, and write it back to `~/.config/wf/wf_config.toml`.
 
 3. If step 2 yields nothing, ask the user to reconstruct manually — **do not guess field values** (especially `identity.team_id` and `identity.user_id`, which are UUIDs the Linear API requires to be exact).

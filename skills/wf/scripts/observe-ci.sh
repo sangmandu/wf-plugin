@@ -5,7 +5,7 @@ set -euo pipefail
 # observe-ci.sh — deterministic CI status observer
 #
 # Drives itself from [repos.<project>].ci_checks in
-# ${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml (populated by CI_SETUP).
+# wf_config.toml (populated by CI_SETUP).
 # Queries both GitHub check-runs AND commit statuses so external CI
 # (Jenkins, CircleCI, etc.) are covered.
 #
@@ -14,6 +14,7 @@ set -euo pipefail
 
 PR="${1:?Usage: observe-ci.sh <PR_NUMBER>}"
 
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 STATE=".workflow/state.json"
 if [ ! -f "$STATE" ]; then
   echo '{"status":"error","next_action":"ALERT_USER","remediation":"Missing .workflow/state.json"}'
@@ -21,7 +22,7 @@ if [ ! -f "$STATE" ]; then
 fi
 
 PROJECT="$(jq -r '.data.project_name // ""' "$STATE")"
-CONFIG_PY="$HOME/.claude/skills/wf/lib/config.py"
+CONFIG_PY="$WF_ROOT/lib/config.py"
 
 CI_CHECKS_JSON="$(python3 "$CONFIG_PY" "repos.$PROJECT.ci_checks" --json 2>/dev/null || echo '[]')"
 

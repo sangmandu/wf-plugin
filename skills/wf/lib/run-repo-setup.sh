@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
 # ─────────────────────────────────────────────────────────
 # run-repo-setup.sh — execute per-repo setup commands
 #
 # Reads data.project_name from .workflow/state.json, looks up
-# [repos.<project>] in ${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml,
+# [repos.<project>] in wf_config.toml,
 # runs each entry in setup_commands and then copies any
 # worktree_copy_from_main files from the main repo.
 #
@@ -22,7 +24,7 @@ STATE=".workflow/state.json"
 PROJECT="$(jq -r '.data.project_name // ""' "$STATE")"
 [[ -n "$PROJECT" ]] || { echo "ERROR: data.project_name not set in state.json" >&2; exit 1; }
 
-CONFIG_PY="$HOME/.claude/skills/wf/lib/config.py"
+CONFIG_PY="$WF_ROOT/lib/config.py"
 
 if ! python3 "$CONFIG_PY" --has-repo "$PROJECT" >/dev/null 2>&1; then
   echo "[run-repo-setup] No [repos.$PROJECT] section — run ensure-repo-config.sh first." >&2
