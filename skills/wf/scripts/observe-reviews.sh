@@ -140,7 +140,8 @@ else:
 lines.append('')
 
 if bots:
-    lines.append(f'Detected bots: {", ".join(sorted(bots))}')
+    bot_list = ", ".join(sorted(bots))
+    lines.append(f'Detected bots: {bot_list}')
     lines.append('')
 
 if latest_review:
