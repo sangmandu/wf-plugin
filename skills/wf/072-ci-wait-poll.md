@@ -9,7 +9,7 @@ Poll CI status using a deterministic script that handles the entire polling loop
 
 - [ ] Run the CI polling loop (blocks until terminal state):
   ```bash
-  bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/scripts/wait-for-ci.sh <pr-number>
+  bash <WF_DIR>/scripts/wait-for-ci.sh <pr-number>
   ```
   This script internally polls every 30s for up to 15 minutes. It returns only when CI reaches a terminal state. **Do NOT manage the loop yourself.**
 

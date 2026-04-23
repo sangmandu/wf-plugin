@@ -8,7 +8,7 @@ type: reference
 
 에이전트는 **state.json을 직접 편집하지 않는다**. 모든 변경은 아래 스크립트를 경유한다. state.json은 `control`(상태 머신)과 `data`(step metadata) 두 네임스페이스로 나뉘며 각각 전담 스크립트가 다르다 (스키마 상세: `10-state-machine.md`).
 
-경로 기준: `${CLAUDE_PLUGIN_ROOT}/skills/wf/`. `scripts/` 접두사는 하위 폴더.
+경로 기준: `<WF_DIR>/`. `scripts/` 접두사는 하위 폴더.
 
 ## 상태 전이 (`control.*`) — 상세: `10-state-machine.md`
 

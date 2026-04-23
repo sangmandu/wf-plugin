@@ -24,15 +24,17 @@ The reproduction gate is non-negotiable. Code-analysis hypotheses are not reprod
 
 ## Execution
 
+`WF_DIR` = the parent directory of this file (i.e. the directory containing `run.sh`, `SKILL.md`, etc.). Derive it from the path this file was loaded from.
+
 1. Ask the user for the bug report if it is not already in the conversation. Capture the exact error message, screenshot, or behavior description verbatim.
 2. Initialize the workflow with the fix track:
    ```bash
-   bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/init-workflow.sh fix "<task_description>"
+   bash <WF_DIR>/run.sh init fix "<task_description>"
    ```
 3. The script outputs the first step's instructions. Follow them.
 4. On complete, run:
    ```bash
-   bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh <STEP_KEY>
+   bash <WF_DIR>/run.sh complete <STEP_KEY>
    ```
 5. Follow the next step output. Repeat until the workflow is done.
 
@@ -42,5 +44,5 @@ If the reported "bug" turns out on investigation to be a missing feature or a sp
 
 ## Rules
 
-Per `${CLAUDE_PLUGIN_ROOT}/skills/wf/SKILL.md` for interrupt conditions and step execution rules.
-Per `${CLAUDE_PLUGIN_ROOT}/skills/wf/helpers.yaml` for shared protocols.
+Per `<WF_DIR>/SKILL.md` for interrupt conditions and step execution rules.
+Per `<WF_DIR>/helpers.yaml` for shared protocols.

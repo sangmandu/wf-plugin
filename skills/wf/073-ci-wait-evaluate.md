@@ -7,7 +7,7 @@ Evaluate CI results and handle failures.
 
 ## Checklist
 
-- [ ] **All 3 checks passed** → run `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh CI_WAIT_EVALUATE`
+- [ ] **All 3 checks passed** → run `bash <WF_DIR>/lib/complete-step.sh CI_WAIT_EVALUATE`
 - [ ] **CI failed** (build/test/lint/typecheck — NOT the review check):
   - [ ] Show failure details: `gh run view <run-id> --log-failed`
   - [ ] Analyze root cause
@@ -16,7 +16,7 @@ Evaluate CI results and handle failures.
   - [ ] Stage + commit + push (follow `helpers#git_rules`)
   - [ ] Increment `ci_attempt` in state.json (max 3 before asking user)
   - [ ] Append to `ci_conclusions[]` in state.json
-  - [ ] `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh CI_WAIT_REBASE CI_WAIT_REBASE CI_WAIT_POLL CI_WAIT_EVALUATE`
+  - [ ] `bash <WF_DIR>/lib/rewind-step.sh CI_WAIT_REBASE CI_WAIT_REBASE CI_WAIT_POLL CI_WAIT_EVALUATE`
 
 ## IMPORTANT
 

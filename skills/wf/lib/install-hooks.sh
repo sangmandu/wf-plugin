@@ -8,13 +8,14 @@
 # The skill owns its own hook definitions; no external template file.
 set -euo pipefail
 
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ROOT="${1:-$PWD}"
 SETTINGS="$ROOT/.claude/settings.json"
 
 # Marker for idempotency and future removal. Kept in command string itself
 # since Claude settings schema doesn't allow arbitrary metadata fields.
-INTERRUPT_CMD="bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/user-interrupt.sh"
-STOP_CMD="bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/stop-guard.sh"
+INTERRUPT_CMD="bash $WF_ROOT/user-interrupt.sh"
+STOP_CMD="bash $WF_ROOT/stop-guard.sh"
 
 if [ ! -f "$SETTINGS" ]; then
   echo "error: $SETTINGS not found — cannot install wf hooks." >&2

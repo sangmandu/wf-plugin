@@ -52,7 +52,7 @@ if echo "$CI_CHECKS_JSON" | jq -e '. == [] or . == null' >/dev/null 2>&1; then
   "missing_reason": "ci_checks_not_discovered",
   "failed_jobs": [],
   "next_action": "ALERT_USER",
-  "remediation": "ci_checks is empty — run bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/discover-ci.sh (CI_SETUP step) before polling."
+  "remediation": "ci_checks is empty — run bash $WF_ROOT/lib/discover-ci.sh (CI_SETUP step) before polling."
 }
 EOF
   exit 0

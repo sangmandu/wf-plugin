@@ -39,7 +39,7 @@ track-steps.json         ← track별 실행 순서
 
 **md 파일 관례**:
 - 에이전트가 그대로 읽고 실행할 **지시사항**으로 작성
-- 마지막에 `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh <STEP_KEY>` 호출 안내
+- 마지막에 `bash <WF_DIR>/lib/complete-step.sh <STEP_KEY>` 호출 안내
 - 외부 명령 실행 시 결과 해석이 자유로우면 안 됨 → observer 스크립트 사용 권장
 
 ### 2. `step-registry.json`에 등록
@@ -108,12 +108,12 @@ INTERRUPT_STEPS=(
 2. **입력**: 사용할 state.json payload / 앞 스텝 결과
 3. **행동**: 순차 지시 (bash 명령, 파일 편집 등)
 4. **검증**: 완료 조건 (테스트 통과, PR 생성 확인 등)
-5. **완료**: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh <KEY>` 호출
+5. **완료**: `bash <WF_DIR>/lib/complete-step.sh <KEY>` 호출
 
 ### state.json 접근
 state는 `control.*` / `data.*` 네임스페이스로 분리됨. 스텝에서 payload를 읽고/쓸 때:
-- 쓰기: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value> [--append]`
-- 읽기: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh <key>` (없으면 exit 1) 또는 `jq -r '.data.<key>' .workflow/state.json`
+- 쓰기: `bash <WF_DIR>/lib/set-data.sh <key> <value> [--append]`
+- 읽기: `bash <WF_DIR>/lib/get-data.sh <key>` (없으면 exit 1) 또는 `jq -r '.data.<key>' .workflow/state.json`
 - `control.*` 직접 편집 금지 — 모든 상태 전이는 전용 스크립트 경유 (불변 조건)
 
 ## Track 수정

@@ -43,4 +43,4 @@ the review workflow's run status first.
 
 - [ ] Record `review_verdict` (`"APPROVED"` or `"CHANGES_REQUESTED"`) in state.json for downstream steps.
 
-- [ ] Run `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh REVIEW_CHECK_VERDICT`. The next steps (FETCH/REPLY/APPLY) are no-ops on APPROVED and naturally flow to `REVIEW_EXIT_APPROVED`.
+- [ ] Run `bash <WF_DIR>/lib/complete-step.sh REVIEW_CHECK_VERDICT`. The next steps (FETCH/REPLY/APPLY) are no-ops on APPROVED and naturally flow to `REVIEW_EXIT_APPROVED`.

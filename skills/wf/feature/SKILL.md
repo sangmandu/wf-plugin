@@ -18,19 +18,21 @@ This is the default `/wf` track. Use it for anything that is **not** a bug fix, 
 
 ## Execution
 
+`WF_DIR` = the parent directory of this file (i.e. the directory containing `run.sh`, `SKILL.md`, etc.). Derive it from the path this file was loaded from.
+
 1. Ask the user for the task description if not already provided.
 2. Initialize the workflow with the feature track:
    ```bash
-   bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/init-workflow.sh feature "<task_description>"
+   bash <WF_DIR>/run.sh init feature "<task_description>"
    ```
 3. The script outputs the first step's instructions. Follow them.
 4. On complete, run:
    ```bash
-   bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh <STEP_KEY>
+   bash <WF_DIR>/run.sh complete <STEP_KEY>
    ```
 5. Follow the next step output. Repeat until the workflow is done.
 
 ## Rules
 
-Per `${CLAUDE_PLUGIN_ROOT}/skills/wf/SKILL.md` for interrupt conditions and step execution rules.
-Per `${CLAUDE_PLUGIN_ROOT}/skills/wf/helpers.yaml` for shared protocols.
+Per `<WF_DIR>/SKILL.md` for interrupt conditions and step execution rules.
+Per `<WF_DIR>/helpers.yaml` for shared protocols.

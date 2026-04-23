@@ -43,8 +43,8 @@ Per `helpers#debate_protocol` — triangular debate (PRO / NEUTRAL / CON).
 - [ ] Review all 3 positions. Incorporate valid feedback into test files directly.
 - [ ] Increment `debate_test_count`:
   ```bash
-  CURRENT=$(bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh debate_test_count 2>/dev/null || echo 0)
-  bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh debate_test_count "$((CURRENT + 1))"
+  CURRENT=$(bash <WF_DIR>/lib/get-data.sh debate_test_count 2>/dev/null || echo 0)
+  bash <WF_DIR>/lib/set-data.sh debate_test_count "$((CURRENT + 1))"
   ```
 - [ ] Always PASS and proceed to next step
 

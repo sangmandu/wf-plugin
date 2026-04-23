@@ -75,7 +75,7 @@ cwd에 의존하지 않음. 글로벌 레지스트리도 없음.
 세션 A 죽음 → state.json.data.owner_session_id = "<uuid-A>" 로 남음
 
 다음 세션 B (동일 worktree 대상)에서:
-  bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/resume-workflow.sh
+  bash <WF_DIR>/lib/resume-workflow.sh
       │
       ▼ owner_session_id = "" 로 비움
       │

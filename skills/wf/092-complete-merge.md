@@ -17,7 +17,7 @@ After running `gh pr merge`, check the result. Only two outcomes allow proceedin
 |---------|--------|
 | **Merged successfully** | Update Linear → Done. Proceed. |
 | **Branch protection blocks merge** (e.g. "requires peer approval") and there are **no CHANGES_REQUESTED reviews** | Update Linear → Done. Proceed — peer will merge manually. |
-| **CHANGES_REQUESTED review exists** | Do NOT proceed. Rewind to review loop: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh REVIEW_CHECK_VERDICT REVIEW_CHECK_VERDICT REVIEW_FETCH_COMMENTS REVIEW_REPLY REVIEW_APPLY_FIXES REVIEW_EXIT_APPROVED` |
+| **CHANGES_REQUESTED review exists** | Do NOT proceed. Rewind to review loop: `bash <WF_DIR>/lib/rewind-step.sh REVIEW_CHECK_VERDICT REVIEW_CHECK_VERDICT REVIEW_FETCH_COMMENTS REVIEW_REPLY REVIEW_APPLY_FIXES REVIEW_EXIT_APPROVED` |
 | **Any other failure** | Report the error to the user. Do not assume merged. |
 
 The key distinction: "needs peer approval" (no one reviewed yet) is OK to proceed — the peer will approve and merge. "Changes requested" (someone reviewed and rejected) means the code needs fixes — must loop back.
@@ -35,7 +35,7 @@ The key distinction: "needs peer approval" (no one reviewed yet) is OK to procee
   ```
 - [ ] If CHANGES_REQUESTED count > 0 → rewind to review loop (see table above)
 - [ ] If 0 → proceed (peer will approve and merge manually)
-- [ ] **Verify merge succeeded** (if merge command ran): `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/scripts/check-merge-status.sh <pr-number>`
+- [ ] **Verify merge succeeded** (if merge command ran): `bash <WF_DIR>/scripts/check-merge-status.sh <pr-number>`
 - [ ] Update Linear ticket to Done: `mcp__linear__save_issue` with state = "Done"
 
 Per `helpers#state_transition` — complete `COMPLETE_MERGE`

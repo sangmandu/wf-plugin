@@ -22,6 +22,7 @@ set -euo pipefail
 # Limit: 100 chars, single line.
 # ─────────────────────────────────────────────────────────
 
+WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REASON="${1:-agent needs input}"
 
 if [[ "$REASON" == *$'\n'* ]]; then
@@ -88,19 +89,20 @@ context. Bridge the information asymmetry. No file-dump + "proceed?".
 
 The interrupt stays active across turns. Keep conversing with the user
 as needed. When the topic is resolved and you are returning to the
-workflow, run `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh resume`.
+workflow, run `bash $WF_ROOT/run.sh resume`.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
 
 # Append the explanation_style (PTIA) helper body so the agent has the
 # full pattern visible inline — not just the "apply it here" pointer.
+export WF_ROOT
 python3 - <<'PY'
 import os, sys
 try:
     import yaml
 except ImportError:
     sys.exit(0)
-path = os.path.expanduser("${CLAUDE_PLUGIN_ROOT}/skills/wf/helpers.yaml")
+path = os.path.join(os.environ.get("WF_ROOT", ""), "helpers.yaml")
 if not os.path.exists(path):
     sys.exit(0)
 with open(path) as f:

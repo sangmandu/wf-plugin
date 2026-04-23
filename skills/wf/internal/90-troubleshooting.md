@@ -98,8 +98,8 @@ wf가 꼬이는 전형적 상황과 복구법. 그리고 스크립트 실패 시
 
 | 상황 | 커맨드 |
 |---|---|
-| 세션 복귀 / interrupt 탈출 | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/resume-workflow.sh` |
-| 직전 스텝으로 역행 | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh <TARGET> [RESET...]` |
+| 세션 복귀 / interrupt 탈출 | `bash <WF_DIR>/lib/resume-workflow.sh` |
+| 직전 스텝으로 역행 | `bash <WF_DIR>/lib/rewind-step.sh <TARGET> [RESET...]` |
 | state.json 수동 확인 | `jq . .workflow/state.json` |
 | 현재 스텝 확인 | `jq -r '.control.current_step' .workflow/state.json` |
 | interrupt flag 상태 확인 | `jq '.control | {interrupted, interrupted, interrupt_reason}' .workflow/state.json` |

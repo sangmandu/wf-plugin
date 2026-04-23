@@ -60,13 +60,13 @@ Per `helpers#debate_protocol` — triangular debate (PRO / NEUTRAL / CON).
 
 - [ ] Increment `debate_for_plan_count`:
   ```bash
-  CURRENT=$(bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh debate_for_plan_count 2>/dev/null || echo 0)
-  bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh debate_for_plan_count "$((CURRENT + 1))"
+  CURRENT=$(bash <WF_DIR>/lib/get-data.sh debate_for_plan_count 2>/dev/null || echo 0)
+  bash <WF_DIR>/lib/set-data.sh debate_for_plan_count "$((CURRENT + 1))"
   ```
 - [ ] **Verdict routing**:
   - `pass` → proceed to next step
   - `revise` → check `debate_for_plan_count`:
-    - If `< 3` → save feedback to state.json `verdict_feedback` field → `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh PLAN PLAN DEBATE_FOR_PLAN`
+    - If `< 3` → save feedback to state.json `verdict_feedback` field → `bash <WF_DIR>/lib/rewind-step.sh PLAN PLAN DEBATE_FOR_PLAN`
     - If `>= 3` → escalate to user: "Plan failed to converge after 3 revision rounds. Here are the unresolved concerns: [feedback]"
 
 Per `helpers#state_transition` — complete `DEBATE_FOR_PLAN`

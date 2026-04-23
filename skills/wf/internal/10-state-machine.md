@@ -254,7 +254,7 @@ state.json은 `control`과 `data` 두 네임스페이스로 분리됨.
 **중요**: 모든 스텝을 자동 역행하지 않음. 리셋해야 할 스텝 키를 **명시**해야 함. 예:
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh IMPLEMENT DO_GREEN_TEST SELF_REVIEW COMMIT PR
+bash <WF_DIR>/lib/rewind-step.sh IMPLEMENT DO_GREEN_TEST SELF_REVIEW COMMIT PR
 # → IMPLEMENT로 점프, DO_GREEN_TEST~PR은 pending으로 리셋
 ```
 

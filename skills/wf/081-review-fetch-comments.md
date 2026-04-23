@@ -9,7 +9,7 @@ Fetch ALL review data using the deterministic observer script. The script handle
 
 - [ ] Run the review observer:
   ```bash
-  bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/scripts/observe-reviews.sh <pr-number>
+  bash <WF_DIR>/scripts/observe-reviews.sh <pr-number>
   ```
 
 - [ ] Read the markdown report output. Pay special attention to:

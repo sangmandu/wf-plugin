@@ -16,6 +16,8 @@ set -euo pipefail
 # input (reproduction review, plan confirm, merge, etc.).
 # ─────────────────────────────────────────────────────────
 
+WF_ROOT="$(cd "$(dirname "$0")" && pwd)"
+
 INTERRUPT_STEPS=(
   INVESTIGATE
   VERIFY
@@ -64,6 +66,6 @@ POSITION=$((COMPLETED + 1))
 cat <<EOF
 {
   "decision": "block",
-  "reason": "[wf guard] Workflow is still running — step [$POSITION/$TOTAL] $CURRENT.\nChoose one of the following:\n  1. Step is complete → bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh complete $CURRENT\n  2. Continue working → proceed with the workflow instructions\n  3. Need user input → bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh interrupt \"<reason>\""
+  "reason": "[wf guard] Workflow is still running — step [$POSITION/$TOTAL] $CURRENT.\nChoose one of the following:\n  1. Step is complete → bash $WF_ROOT/run.sh complete $CURRENT\n  2. Continue working → proceed with the workflow instructions\n  3. Need user input → bash $WF_ROOT/run.sh interrupt \"<reason>\""
 }
 EOF

@@ -14,6 +14,7 @@ set -euo pipefail
 #      returning to the main task, you must run run.sh resume"
 # ─────────────────────────────────────────────────────────
 
+WF_ROOT="$(cd "$(dirname "$0")" && pwd)"
 INPUT="$(cat)"
 CWD="$(echo "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)"
 [ -z "$CWD" ] && CWD="$(pwd)"
@@ -31,9 +32,9 @@ CURRENT="$(jq -r '.control.current_step // ""' "$STATE" 2>/dev/null)" || exit 0
 TMP="${STATE}.tmp.$$"
 jq '.control.interrupted = true' "$STATE" > "$TMP" && mv "$TMP" "$STATE"
 
-jq -n --arg step "$CURRENT" '{
+jq -n --arg step "$CURRENT" --arg wf_root "$WF_ROOT" '{
   hookSpecificOutput: {
     hookEventName: "UserPromptSubmit",
-    additionalContext: "[wf] Workflow is paused at step \($step). If the user still needs a back-and-forth, keep the conversation going — the stop hook will allow it. Once the topic is resolved and you are returning to the main workflow task, you MUST run `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh resume` to reopen the workflow loop."
+    additionalContext: "[wf] Workflow is paused at step \($step). If the user still needs a back-and-forth, keep the conversation going — the stop hook will allow it. Once the topic is resolved and you are returning to the main workflow task, you MUST run `bash \($wf_root)/run.sh resume` to reopen the workflow loop."
   }
 }'

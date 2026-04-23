@@ -51,7 +51,7 @@ ELSE:
   ]
   ```
 - [ ] Clear `self_review_findings` from state.json (will be regenerated)
-- [ ] `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh IMPLEMENT IMPLEMENT DO_GREEN_TEST SELF_REVIEW SELF_REVIEW_VERDICT`
+- [ ] `bash <WF_DIR>/lib/rewind-step.sh IMPLEMENT IMPLEMENT DO_GREEN_TEST SELF_REVIEW SELF_REVIEW_VERDICT`
 
 ### Proceed (if must_fix == 0)
 

@@ -12,7 +12,7 @@ Confirm APPROVED status and proceed.
   gh api repos/$REPO/pulls/<pr-number>/reviews \
     --jq '[.[] | select(.user.login == "claude[bot]")] | last | {state}'
   ```
-- [ ] `state == "APPROVED"` confirmed → run `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh REVIEW_EXIT_APPROVED`
+- [ ] `state == "APPROVED"` confirmed → run `bash <WF_DIR>/lib/complete-step.sh REVIEW_EXIT_APPROVED`
 - [ ] Save `review_verdict: "APPROVED"` in state.json
 - [ ] NEVER proceed while CHANGES_REQUESTED remains. If max iterations reached, ask user.
 

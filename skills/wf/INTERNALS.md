@@ -116,7 +116,7 @@ Without this, the Stop hook will block the agent from pausing at that step.
 ## File Layout
 
 ```
-${CLAUDE_PLUGIN_ROOT}/skills/wf/
+<WF_DIR>/
 ├── SKILL.md              ← Agent reads this (execution rules)
 ├── INTERNALS.md          ← You're reading this (modification guide)
 ├── helpers.yaml            ← Agent reads this (shared protocols)

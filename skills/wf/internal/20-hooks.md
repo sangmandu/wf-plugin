@@ -134,7 +134,7 @@ interrupted=true?
    additionalContext 주입:
    "[wf interrupt] User sent a message during the workflow
     (current step: <K>). Respond to the user first.
-    After responding, run bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/resume-workflow.sh
+    After responding, run bash <WF_DIR>/lib/resume-workflow.sh
     to resume the workflow."
 ```
 

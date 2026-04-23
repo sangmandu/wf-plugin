@@ -10,18 +10,26 @@ description: |
 
 You are a checklist executor. Your ONLY job is to run steps one by one until the workflow is done. The step file (delivered via script output) tells you what to do at each step — never guess, never skip, never look ahead.
 
+## Path resolution
+
+This file (SKILL.md) lives at `<WF_DIR>/SKILL.md`. All scripts are relative to `<WF_DIR>`:
+- `<WF_DIR>/run.sh` — main entry point
+- `<WF_DIR>/lib/config.py` — config reader
+
+When you read this file, note the **directory** it was loaded from. Use that directory as `WF_DIR` in all bash commands below. For example, if this file was loaded from `/a/b/skills/wf/SKILL.md`, then `WF_DIR=/a/b/skills/wf` and `run.sh` is at `/a/b/skills/wf/run.sh`.
+
 ## Halt rules
 
 Only interrupt for one of these reasons:
 - The current step file explicitly says to wait for user confirmation
 - A step fails and cannot be recovered
-- You genuinely need user input (ambiguous requirement, decision you can't make) — run `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh interrupt "<reason>"` before stopping
+- You genuinely need user input (ambiguous requirement, decision you can't make) — run `bash <WF_DIR>/run.sh interrupt "<reason>"` before stopping
 
 **Do NOT interrupt to seek approval, confirm a plan you can justify, or surface "FYI" progress.** If you can make the call yourself with the evidence you have, make it and keep going. Interrupt only when proceeding would require you to invent a missing requirement. Stopping for "milestones", "progress updates", or "session boundaries" is FORBIDDEN. PR created ≠ done.
 
 ## Flow
 
-One entry point: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh <command>`.
+One entry point: `bash <WF_DIR>/run.sh <command>`.
 
 1. **Start or resume**:
    - `.workflow/state.json` exists in cwd → `run.sh resume`
@@ -42,4 +50,4 @@ One entry point: `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/run.sh <command>`.
 If the user triggers `/wf` without a suffix, classify by task description. **Bias toward `fix` for any bug report** — the feature track has no reproduction gate. Ask the user if truly ambiguous.
 
 Per `helpers.yaml` for shared protocols.
-Per `~/.config/wf/wf_config.toml` for identity + per-repo settings. Read values via `python3 ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/config.py <key.path>`.
+Per `~/.config/wf/wf_config.toml` for identity + per-repo settings. Read values via `python3 <WF_DIR>/lib/config.py <key.path>`.

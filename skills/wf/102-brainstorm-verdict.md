@@ -49,14 +49,14 @@ Read `state.json` field `brainstorm_debate_count` (initialized to 0 by init-work
 ### Saving brainstorm_debate_count
 
 ```bash
-CURRENT=$(bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh brainstorm_debate_count 2>/dev/null || echo 0)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh brainstorm_debate_count "$((CURRENT + 1))"
+CURRENT=$(bash <WF_DIR>/lib/get-data.sh brainstorm_debate_count 2>/dev/null || echo 0)
+bash <WF_DIR>/lib/set-data.sh brainstorm_debate_count "$((CURRENT + 1))"
 ```
 
 ### Looping back on revise
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/rewind-step.sh BRAINSTORM_DEBATE
+bash <WF_DIR>/lib/rewind-step.sh BRAINSTORM_DEBATE
 ```
 
 ## Rules

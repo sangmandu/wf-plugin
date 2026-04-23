@@ -25,15 +25,15 @@ always:
 
       | Purpose           | Use                                                      |
       | ----------------- | -------------------------------------------------------- |
-      | Read a field      | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh <key>`         |
-      | Write a field     | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value>` |
-      | Append to array   | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value> --append` |
-      | Increment counter | `CURRENT=$(bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh <key> 2>/dev/null || echo 0); bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> "$((CURRENT + 1))"` |
+      | Read a field      | `bash <WF_DIR>/lib/get-data.sh <key>`         |
+      | Write a field     | `bash <WF_DIR>/lib/set-data.sh <key> <value>` |
+      | Append to array   | `bash <WF_DIR>/lib/set-data.sh <key> <value> --append` |
+      | Increment counter | `CURRENT=$(bash <WF_DIR>/lib/get-data.sh <key> 2>/dev/null || echo 0); bash <WF_DIR>/lib/set-data.sh <key> "$((CURRENT + 1))"` |
 
       ### Complete Step
 
       ```bash
-      bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh $STEP
+      bash <WF_DIR>/lib/complete-step.sh $STEP
       ```
 
       This marks `$STEP` completed, advances the state machine, and outputs the next step's full instructions — follow them immediately. Do NOT stop, summarize, or ask the user between steps; the only exceptions are interrupt conditions defined in SKILL.md.
@@ -50,10 +50,10 @@ always:
 
       ```bash
       # overwrite
-      bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value>
+      bash <WF_DIR>/lib/set-data.sh <key> <value>
 
       # append to an array (creates the array if absent)
-      bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value> --append
+      bash <WF_DIR>/lib/set-data.sh <key> <value> --append
       ```
 
       `<value>` is parsed as JSON when possible (numbers, booleans, arrays, objects, `null`); otherwise treated as a raw string. `set-data.sh` touches `control.updated_at` automatically and rejects writes to reserved control keys. Read back with `get-data.sh <key>`.
@@ -80,7 +80,7 @@ on_demand:
     body: |
       ## Load-Config
 
-      Load `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml`. Use `identity.user_id` and `identity.team_id` (UUIDs) when calling Linear API, not names. Read values with `python3 ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/config.py <key.path>` (e.g. `identity.user_id`, `repos.<project>.setup_commands`).
+      Load `<WF_DIR>/config/wf_config.toml`. Use `identity.user_id` and `identity.team_id` (UUIDs) when calling Linear API, not names. Read values with `python3 <WF_DIR>/lib/config.py <key.path>` (e.g. `identity.user_id`, `repos.<project>.setup_commands`).
 
       **Never hand-edit the `[identity]` or `[rules]` sections** (no `sed -i`, no `Edit` tool, no `echo >`). They hold irreplaceable UUIDs and must stay read-only from the skill's perspective. If you need to mutate those fields, STOP and ask the user. `[repos.<project>]` sections are writable when explicitly required (e.g. CI_SETUP appending `ci_checks`).
 
@@ -90,7 +90,7 @@ on_demand:
 
       `lib/preflight-check.sh` is a deterministic shell script called by `init-workflow.sh` before state.json creation. It runs in <1 second and checks:
 
-      1. Global config (`${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml`) existence + `[identity]` section
+      1. Global config (`<WF_DIR>/config/wf_config.toml`) existence + `[identity]` section
       2. Required tools (`jq`, `gh`, `uv`) via `command -v`
       3. `.git/info/exclude` entries for `.specify/` and `.workflow/` (auto-adds if missing)
       4. Stale worktree cleanup (delegates to `lib/cleanup-stale-worktrees.sh`)
