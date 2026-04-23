@@ -16,6 +16,10 @@ Update version in both files:
 
 User config lives at `~/.config/wf/wf_config.toml` (outside plugin cache, writable).
 
+## Sub-Agent Rules
+
+When dispatching sub-agents, MUST invoke the `/subagent` skill first and follow its protocol.
+
 ## Path Rules
 
 - Shell scripts: use `WF_ROOT="$(cd "$(dirname "$0")/.." && pwd)"` for self-locating
