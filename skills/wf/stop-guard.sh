@@ -19,8 +19,6 @@ set -euo pipefail
 WF_ROOT="$(cd "$(dirname "$0")" && pwd)"
 
 INTERRUPT_STEPS=(
-  INVESTIGATE
-  VERIFY
   REPORT
   DEBATE_FOR_PLAN
   EXPLAIN_PLAN
