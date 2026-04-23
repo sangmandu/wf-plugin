@@ -30,16 +30,20 @@ Before attempting to start anything, follow this order:
 - Required credentials/env vars are set
 - You have verified connectivity with at least one real request
 
-## BLOCKED — when you cannot bring up the environment
+## Environment setup is MANDATORY — no BLOCKED state
 
-If the environment cannot be started (missing credentials, server won't start, staging is down), do NOT:
-- Proceed to MAKE_E2E_TEST and write mock-based tests instead
-- Skip this step
-- Claim the environment is "not needed"
+You MUST bring up a real E2E environment. There is no "BLOCKED" option. If you cannot set up the environment on your own:
 
-Instead:
-- Record `e2e_env.status = "BLOCKED"` with the reason in state.json
+1. Exhaust the full lookup chain (CLAUDE.md → memory → skills → existing test files)
+2. If still missing info → **ask the user**. Do NOT proceed without a working environment.
+3. If the user confirms the environment is truly unavailable → `run.sh interrupt "E2E environment unavailable: <reason>"` to halt the workflow
 
-**A blocked environment means MAKE_E2E_TEST cannot produce real E2E tests. This is by design — fake E2E is worse than no E2E.**
+Do NOT:
+- Record a "BLOCKED" status and move on
+- Proceed to MAKE_E2E_TEST without a verified environment
+- Write mock-based tests as a substitute
+- Skip this step or claim the environment is "not needed"
+
+**No environment = no E2E tests = workflow halts. Ask the user, don't silently skip.**
 
 Per `helpers#state_transition` — save `e2e_env` and complete `SETUP_E2E_ENV`
