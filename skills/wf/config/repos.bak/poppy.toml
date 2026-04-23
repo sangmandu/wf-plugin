@@ -1,0 +1,7 @@
+[setup]
+commands = [
+  "pnpm install",
+]
+
+[worktree]
+copy_from_main = []

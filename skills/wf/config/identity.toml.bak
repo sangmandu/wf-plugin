@@ -1,0 +1,17 @@
+[[projects]]
+name = "poppy"
+path = ""
+default_base_branch = "main"
+test_command = "pnpm nx affected -t test"
+
+[identity]
+user_name = "Sangmin Jeon"
+user_id = "cf503ad3-debf-49c6-8577-aa201b7350f0"
+email = "sangmin.jeon@allganize.io"
+team_name = "Local Executable Agent"
+team_id = "705de759-077d-47eb-9cce-16f8617afe52"
+
+[rules]
+mode = "custom"
+linear_rules = ""
+pr_rules = ""

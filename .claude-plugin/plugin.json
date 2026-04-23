@@ -1,0 +1,25 @@
+{
+  "name": "wf",
+  "description": "End-to-end automated dev workflow: user request → reproduction (fix) → Linear ticket → worktree → plan → debate → TDD → PR → CI/review → complete.",
+  "version": "1.0.0",
+  "author": {
+    "name": "mini"
+  },
+  "commands": [
+    "./commands/wf.md",
+    "./commands/setup.md",
+    "./commands/fix.md",
+    "./commands/light.md",
+    "./commands/brainstorm.md"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "wf",
+    "workflow",
+    "automation",
+    "claude-code",
+    "tdd",
+    "ci",
+    "pr"
+  ]
+}

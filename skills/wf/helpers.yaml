@@ -1,0 +1,237 @@
+# Shared protocols for wf steps.
+#
+# Consumed by lib/complete-step.sh + lib/resume-workflow.sh when
+# delivering a step:
+#   1. Every `always.*` section is appended to the step output.
+#   2. Every `on_demand.<key>` whose `<key>` is referenced in the
+#      step body via `helpers#<key>` is also appended.
+#
+# Step files use `helpers#<key>` (no path prefix) as the reference
+# syntax. Keys here are snake_case.
+
+always:
+  state_transition:
+    body: |
+      ## State-Transition
+
+      `.workflow/state.json` is split into two namespaces:
+
+      - **`control.*`** — state machine (status, current_step, steps, interrupt flags, timestamps). Only the wf scripts (`init-workflow.sh`, `complete-step.sh`, `resume-workflow.sh`, `rewind-step.sh`) mutate this. Agents MUST NOT touch `control.*` directly.
+      - **`data.*`** — step-produced metadata (ticket_id, pr_number, review_comments, counters, etc.). Agents read via `get-data.sh` and write via `set-data.sh`.
+
+      ### ⛔ NEVER edit `.workflow/state.json` directly
+
+      No `python -c "json.load(...)"`, no `jq ... > state.json`, no `sed`, no `Edit` tool on the file. Always go through the helper scripts:
+
+      | Purpose           | Use                                                      |
+      | ----------------- | -------------------------------------------------------- |
+      | Read a field      | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh <key>`         |
+      | Write a field     | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value>` |
+      | Append to array   | `bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value> --append` |
+      | Increment counter | `CURRENT=$(bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/get-data.sh <key> 2>/dev/null || echo 0); bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> "$((CURRENT + 1))"` |
+
+      ### Complete Step
+
+      ```bash
+      bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/complete-step.sh $STEP
+      ```
+
+      This marks `$STEP` completed, advances the state machine, and outputs the next step's full instructions — follow them immediately. Do NOT stop, summarize, or ask the user between steps; the only exceptions are interrupt conditions defined in SKILL.md.
+
+      ### Skip Step
+
+      Steps absent from the current track's `control.steps` are automatically skipped by the Resume logic — no action needed.
+
+      ### Fail Step
+
+      There is no dedicated "fail" transition. Use `agent-interrupt.sh` to surface the error to the user; the workflow stays on the running step until the user resumes or rewinds.
+
+      ### Save Step Metadata
+
+      ```bash
+      # overwrite
+      bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value>
+
+      # append to an array (creates the array if absent)
+      bash ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/set-data.sh <key> <value> --append
+      ```
+
+      `<value>` is parsed as JSON when possible (numbers, booleans, arrays, objects, `null`); otherwise treated as a raw string. `set-data.sh` touches `control.updated_at` automatically and rejects writes to reserved control keys. Read back with `get-data.sh <key>`.
+
+  display_checklist:
+    body: |
+      ## Display-Checklist
+
+      Use `[v]` for passed, `[ ]` for failed, with `━━━` separator lines.
+
+  git_rules:
+    body: |
+      ## Git-Rules
+
+      - NEVER use `git add -A` or `git add .`
+      - NEVER push directly to main
+      - NEVER use `--amend` or `--no-verify`
+      - Stage only relevant files by name
+      - Commit format: `type(scope): [TICKET-ID] Description`
+      - Branch name: exactly ticket ID (e.g., `ALL-1234`), UPPERCASE required, nothing else appended
+
+on_demand:
+  load_config:
+    body: |
+      ## Load-Config
+
+      Load `${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml`. Use `identity.user_id` and `identity.team_id` (UUIDs) when calling Linear API, not names. Read values with `python3 ${CLAUDE_PLUGIN_ROOT}/skills/wf/lib/config.py <key.path>` (e.g. `identity.user_id`, `repos.<project>.setup_commands`).
+
+      **Never hand-edit the `[identity]` or `[rules]` sections** (no `sed -i`, no `Edit` tool, no `echo >`). They hold irreplaceable UUIDs and must stay read-only from the skill's perspective. If you need to mutate those fields, STOP and ask the user. `[repos.<project>]` sections are writable when explicitly required (e.g. CI_SETUP appending `ci_checks`).
+
+  preflight_check:
+    body: |
+      ## Preflight-Check
+
+      `lib/preflight-check.sh` is a deterministic shell script called by `init-workflow.sh` before state.json creation. It runs in <1 second and checks:
+
+      1. Global config (`${CLAUDE_PLUGIN_ROOT}/skills/wf/config/wf_config.toml`) existence + `[identity]` section
+      2. Required tools (`jq`, `gh`, `uv`) via `command -v`
+      3. `.git/info/exclude` entries for `.specify/` and `.workflow/` (auto-adds if missing)
+      4. Stale worktree cleanup (delegates to `lib/cleanup-stale-worktrees.sh`)
+
+      On success: exit 0, no stdout. On failure: exit 1, stdout lists errors + remediation instructions.
+
+  recovering_config:
+    body: |
+      ## Recovering-Config
+
+      If `identity.toml` is missing or malformed, preflight fails. Recovery recipe (including extracting values from past session transcripts) lives in `lib/recover-config.md` — read that file only when recovery is actually needed.
+
+  project_commands:
+    body: |
+      ## Project-Commands
+
+      Run the project's validation commands. Read the project's CLAUDE.md for specific commands. If no CLAUDE.md exists, look for Makefile, package.json scripts, pyproject.toml, or similar. Common patterns:
+
+      - `pnpm nx affected` (Nx monorepo)
+      - `make test` (Makefile)
+      - `pnpm test` / `npm test` (Node.js)
+      - `pytest` (Python)
+
+  debate_protocol:
+    body: |
+      ## Debate-Protocol
+
+      Triangular debate with 3 sub-agents (PRO / NEUTRAL / CON), followed by a Verdict agent.
+
+      ### Step 1: Launch 3 debate agents in parallel
+
+      | Agent       | Role                                                                 |
+      | ----------- | -------------------------------------------------------------------- |
+      | **PRO**     | Defend the plan/tests. Find supporting evidence.                     |
+      | **NEUTRAL** | Analyze objectively. Compare alternatives, present trade-offs.       |
+      | **CON**     | Attack the plan/tests. Find fundamental flaws, propose alternatives. |
+
+      All agents MUST search for real evidence and cite specifics — no vague claims.
+
+      ### Step 2: Verdict agent
+
+      Launch a single **Verdict agent** (Opus) that receives all 3 debate outputs. The Verdict agent:
+
+      1. Synthesizes the strongest arguments from all positions.
+      2. Incorporates valid feedback into the plan/test files.
+      3. Issues a verdict: **pass**, **revise**, or **block**.
+
+      | Verdict   | Action                                                                                         |
+      | --------- | ---------------------------------------------------------------------------------------------- |
+      | **pass**  | Proceed to next step                                                                           |
+      | **revise**| Loop back (plan sub-agent rewrites with Verdict feedback). Max 3 attempts total.               |
+      | **block** | Escalate to user — fundamental issues that need human judgment                                 |
+
+      ### Verdict agent context rules
+
+      The Verdict agent MUST read primary sources directly — never rely on the main agent's summaries.
+
+      1. **Pass output file paths, not summaries.** Each debate sub-agent produces an output file. Pass these file paths to the Verdict agent so it reads the full debate output directly. Do NOT summarize, paraphrase, or selectively quote debate outputs in the verdict prompt.
+      2. **Instruct the Verdict agent to read files directly.** Its prompt must include:
+         - The plan/spec/test file path (e.g. `.workflow/plan.md`)
+         - The 3 debate output file paths (from the `cx-read` completion notifications)
+         - Any code files referenced by the debate agents
+      3. **No leading questions.** Do not frame the verdict prompt with bias like "is X correct?" or "is X better than Y?". State the task neutrally: "Synthesize and judge."
+      4. **No inline summaries from the main agent.** If you find yourself writing "PRO says X, CON says Y" in the verdict prompt, stop — that is a summary. Point to the files instead.
+
+      ### Rules
+
+      - Track attempt count in `state.json` via `debate_for_plan_count` / `debate_test_count`.
+      - On `revise`: if the counter reaches 3, escalate to user instead of looping.
+      - On `revise`: use `rewind-step.sh` to reset relevant steps to `pending` and loop back.
+      - Plan generation is always delegated to a **Plan sub-agent** (Opus), never the main agent.
+
+  explanation_style:
+    body: |
+      ## Explanation-Style: PTIA
+
+      When explaining a concept to the user, follow this 4-step pattern in order:
+
+      ### 1. Problem-First Entry
+      Start with "this is broken/impossible without X" — not the concept name or definition.
+      - BAD: "RunSession is a state object for SSE reconnection"
+      - GOOD: "When the user refreshes mid-stream, the AI response is lost. To resume instead of restart, we need..."
+
+      ### 2. Timeline Walkthrough
+      Show as a time-ordered scenario, not a static structure diagram.
+      "First this happens → then this happens → so this is needed"
+      Use numbered sequences or ASCII flows with temporal progression.
+
+      ### 3. Inline Data Example
+      Show real values in code blocks. Never describe data abstractly when you can show it.
+      - BAD: "Each event is assigned a sequential ID"
+      - GOOD: `event: TEXT_MESSAGE_CONTENT  sseId: "3"  ← "안녕하"`
+
+      ### 4. One-Word Anchor
+      Map the concept to something the user already knows with ONE word/phrase.
+      Do not explain the analogy itself — just state the mapping.
+      | threadId | 카톡 채팅방 |
+      | lastEventId | 책갈피 |
+
+      ### Rules
+      - Apply all 4 steps for each concept. Skipping steps makes explanations either too abstract (missing 1-3) or ungrounded (missing 4).
+      - If the user asks a follow-up, answer using the same pattern before moving on.
+
+  test_tiers:
+    body: |
+      ## Test-Tiers
+
+      Every test written by the workflow belongs to exactly one tier. Pick the tier by answering the decision tree in order; do NOT skip tiers.
+
+      ### Unit (040-make-unit-test.md)
+
+      - **SUT**: a single pure function.
+      - **Dependencies**: standard library + values passed in. No import of sibling modules, no I/O, no network, no filesystem, no global state.
+      - **Mock rule**: if the function cannot be tested without a mock, it is NOT a unit test — promote to Integration. Mock-heavy unit tests score 100% because the test controls both sides; they carry near-zero signal.
+      - **Shape**: input → output mapping only.
+
+      ### Integration (041-make-integration-test.md)
+
+      - **SUT**: two or more modules within the same package wired together with their real imports.
+      - **Stubs allowed ONLY at hard external boundaries**: network, filesystem, third-party SaaS, cross-package seams. Stubbing an internal module of the package under test is forbidden (that collapses back into Integration-as-unit, which is pointless).
+      - **Shape**: exercises the composition path — proves the modules agree on contracts and wiring, something unit tests cannot prove.
+
+      ### E2E (042-make-e2e-test.md)
+
+      - **SUT**: the full user-facing flow.
+      - **Environment**: real services, real DB, real runtime. No stubs inside the SUT.
+      - **Failure taxonomy**: distinguish FAILED (environment is up but an assertion broke — real signal) from BLOCKED (environment cannot be brought up — missing credentials, staging down; surface via `agent-interrupt.sh`, do NOT mark as passed or failed).
+
+      ### Decision tree
+
+      ```
+      Q1. Is the SUT a single pure function with no cross-module imports?
+          YES → Unit
+      Q2. Is the SUT multiple modules in the same package, with stubs only at external boundaries?
+          YES → Integration
+      Q3. Does the SUT require a real running system (services, DB, auth)?
+          YES → E2E
+      ```
+
+      ### Anti-patterns
+
+      - "Unit test with 5 mocks" — promote to Integration or delete.
+      - "Integration test that stubs an internal helper" — remove the stub and wire the real helper, or demote to Unit if the helper is not actually needed.
+      - "E2E test that passes when staging is unreachable" — must be BLOCKED, not passed.

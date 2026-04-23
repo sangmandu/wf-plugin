@@ -1,0 +1,24 @@
+{
+  "name": "wf",
+  "owner": {
+    "name": "mini"
+  },
+  "metadata": {
+    "description": "End-to-end automated dev workflow: user request → reproduction (fix) → Linear ticket → worktree → plan → debate → TDD → PR → CI/review → complete.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "wf",
+      "source": "./",
+      "description": "End-to-end automated dev workflow with 4 tracks: feature, fix, light, brainstorm.",
+      "category": "productivity",
+      "tags": [
+        "wf",
+        "workflow",
+        "automation",
+        "claude-code"
+      ]
+    }
+  ]
+}

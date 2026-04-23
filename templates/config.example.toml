@@ -1,0 +1,23 @@
+# wf unified config
+#
+# Sections:
+#   [identity]          — Linear user/team (UUIDs required for Linear API)
+#   [rules]             — ticket/PR style rules
+#   [repos.<name>]      — per-repo settings
+
+[identity]
+user_name = ""
+user_id = ""
+email = ""
+team_name = ""
+team_id = ""
+
+[rules]
+mode = "custom"
+linear_rules = ""
+pr_rules = ""
+
+# ── Repos ──────────────────────────────────────────────────────────────
+# [repos.my-project]
+# ci_checks = []
+# setup_commands = []
